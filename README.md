@@ -23,6 +23,8 @@ Plug 'junegunn/fzf'
         Plug 'Konfekt/zappykasten.vim'
 ```
 
+Give [autosync](https://github.com/benstaniford/vim-autosync) a spin to keep it in sync with a git repo.
+
 ## Initial Setup
 
 Set the directories in which to search for notes and a *main* directory, in which to store new notes (which both default to `~/zettelkasten`):
