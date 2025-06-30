@@ -8,9 +8,16 @@ if !executable('rg')
 endif
 
 " Ensure the Vim plug-in `Fzf` is installed
+let s:use_fzf_lua = 0
+
 if exists(':FZF') != 2
-    echomsg 'The Vim plug-in `Fzf` is not installed. See https://github.com/junegunn/fzf for installation instructions.'
-    finish
+    if exists(':FzfLua') != 2
+        echomsg 'The Vim plug-in `Fzf` is not installed. See https://github.com/junegunn/fzf for installation instructions.'
+        echomsg 'Neovim also supports `fzf-lua`.'
+        finish
+    else
+        let s:use_fzf_lua = 1
+    endif
 endif
 
 let s:ext = get(g:, 'zk_default_extension', '.md')
@@ -44,7 +51,7 @@ else
     endif
 endif
 
-let s:has_colon = 
+let s:has_colon =
       \ has('win32unix') && g:zk_main_directory =~? '^/[a-z]/' ||
       \ has('win32') && g:zk_main_directory =~? '^[a-z]:'
 
@@ -362,44 +369,52 @@ endfunction
 " }}}
 
 " Command to start fuzzy search {{{1
-silent! command -nargs=* -bang ZK
-      \ call fzf#run(
-          \ fzf#wrap({
-              \ 'sink*': function('ZK_note_handler'),
-              \ 'source': join(
-                    \   s:rg_command
-                    \ + s:rg_musts
-                    \ + s:rg_options
-                    \ + [
-                    \     empty(<q-args>) ? '"\S"' : shellescape(<q-args>),
-                    \     join(map(copy(s:search_paths), 'shellescape(v:val)')),
-                    \     s:format_path_expr,
-                    \     '2>' . s:null_path,
-                    \   ]
-                    \ ),
-              \ 'window': s:window_command,
-              \ s:window_direction: get(g:, 'zk_window_width', &lines < 40 ? '60%' : '40%'),
-              \ 'options': join(s:fzf_musts + s:fzf_options)
-                    \ ..' '..s:fzf_preview_options..':'..get(g:, 'zk_preview_direction', &columns > 100 ? 'right' : 'down')
-                    \ ..' '..'--bind=?:"change-preview-window('.. (&columns > 100 ? 'down' : 'right') ..',border-top|hidden|)"',
-              \ }, <bang>0))
+if s:use_fzf_lua
+    silent! command -nargs=* -bang ZK lua require('zappykasten.fzf-lua')
+        \.search_notes(vim.fn.eval("s:main_dir"),
+        \   vim.fn.eval("s:create_note_key"),
+        \   vim.fn.eval("s:yank_key"),
+        \   vim.fn.eval("s:rg_musts + s:rg_options"))
+else
+    silent! command -nargs=* -bang ZK
+          \ call fzf#run(
+              \ fzf#wrap({
+                  \ 'sink*': function('ZK_note_handler'),
+                  \ 'source': join(
+                        \   s:rg_command
+                        \ + s:rg_musts
+                        \ + s:rg_options
+                        \ + [
+                        \     empty(<q-args>) ? '"\S"' : shellescape(<q-args>),
+                        \     join(map(copy(s:search_paths), 'shellescape(v:val)')),
+                        \     s:format_path_expr,
+                        \     '2>' . s:null_path,
+                        \   ]
+                        \ ),
+                  \ 'window': s:window_command,
+                  \ s:window_direction: get(g:, 'zk_window_width', &lines < 40 ? '60%' : '40%'),
+                  \ 'options': join(s:fzf_musts + s:fzf_options)
+                        \ ..' '..s:fzf_preview_options..':'..get(g:, 'zk_preview_direction', &columns > 100 ? 'right' : 'down')
+                        \ ..' '..'--bind=?:"change-preview-window('.. (&columns > 100 ? 'down' : 'right') ..',border-top|hidden|)"',
+                  \ }, <bang>0))
 
-" Let's break down the even more cryptic --preview-window expression
-"
-"     --preview-window '~4,+{2}+4/3,<80(up)'
-"
-" - ~4 makes the top four lines "sticky" header so that they are always
-"   visible regardless of the scroll offset. (Did I mention that you can
-"   scroll the preview window with your mouse/trackpad?)
-" - +{2} - The base offset is extracted from the second token
-" - +4 - We add 4 lines to the base offset to compensate for the header
-" - /3 adjusts the offset so that the matching line is shown at a third
-"   position in the window
-" - <80(up) - This expression specifies the alternative options for the
-"   preview window. By default, the preview window opens on the right side
-"   with 50% width. But if the width is narrower than 80 columns, it will open
-"   above the main window with 50% height.
-" }}}
+    " Let's break down the even more cryptic --preview-window expression
+    "
+    "     --preview-window '~4,+{2}+4/3,<80(up)'
+    "
+    " - ~4 makes the top four lines "sticky" header so that they are always
+    "   visible regardless of the scroll offset. (Did I mention that you can
+    "   scroll the preview window with your mouse/trackpad?)
+    " - +{2} - The base offset is extracted from the second token
+    " - +4 - We add 4 lines to the base offset to compensate for the header
+    " - /3 adjusts the offset so that the matching line is shown at a third
+    "   position in the window
+    " - <80(up) - This expression specifies the alternative options for the
+    "   preview window. By default, the preview window opens on the right side
+    "   with 50% width. But if the width is narrower than 80 columns, it will open
+    "   above the main window with 50% height.
+    " }}}
+endif
 
 " Mark the script as loaded
 let g:loaded_zappykasten = 1
