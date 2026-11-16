@@ -3,7 +3,7 @@ command! -range=% -bang -nargs=? -complete=tag -bar Ilist  call search#list('i',
 
 " jump to selected include / list selected includes {{{
 nnoremap <expr> [I      ':<c-u>Ilist \V' . escape(expand('<cword>'), '\') . '<cr>'
-nnoremap <expr> ]I      line('.') < line('$') ? ':<c-u>+,$Ilist \V'. escape(expand('<cword>'), '\') : ''
+nnoremap <expr> ]I      line('.') < line('$') ? ':<c-u>+,$Ilist \V' . escape(expand('<cword>'), '\') . '<cr>' : ''
 " }}}
 
 " jump to selected makro / list selected makros {{{
