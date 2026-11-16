@@ -4,8 +4,9 @@ function! search#list(type, line1, line2, bang, search_pattern) abort
     let type = a:type
     let l:output = ''
     redir => l:output
-    let search_pattern =
-          \ (a:search_pattern =~# '\v^/?$' ? '/' . @/ : a:search_pattern)
+    " Without a pattern, use the last search pattern.
+    let pattern = a:search_pattern =~# '\v^/?$' ? @/ : a:search_pattern
+    let search_pattern = a:search_pattern =~# '\v^/?$' ? '/' . @/ : a:search_pattern
     silent! execute a:line1 . ',' . a:line2 . type . 'list' . a:bang . ' ' . search_pattern
     redir END
     let lines = split(l:output, '\n')
@@ -23,7 +24,7 @@ function! search#list(type, line1, line2, bang, search_pattern) abort
         else
             let lnum = split(line)[1]
             let text = substitute(line, '^\s*.\{-}:\s*\S\{-}\s', '', '')
-            let col  = match(text, a:search_pattern) + 1
+            let col  = match(text, pattern) + 1
             call add(qf_entries, {'filename': filename, 'lnum': lnum, 'col': col, 'vcol': 1, 'text': text})
         endif
     endfor

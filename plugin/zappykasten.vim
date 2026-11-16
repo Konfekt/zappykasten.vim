@@ -79,7 +79,7 @@ endif
 let s:rg_options += [
       \ get(g:, 'zk_include_hidden', 0) ? '--hidden' : '',
       \ get(g:, 'zk_use_ignore_files', 1) ? '' : '--no-ignore',
-      \ ] + map(copy(s:ignore_pattern), '"--glob !''" . v:val . "''"')
+      \ ] + map(copy(s:ignore_pattern), '"--glob " . shellescape("!" . v:val)')
 unlet s:ignore_pattern
 
 " }}}
