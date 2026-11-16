@@ -26,3 +26,10 @@ function! Test_no_match_is_reported() abort
   Ilist \Vnothere
   call assert_match('Could not find', execute('messages'))
 endfunction
+
+function! Test_last_search_pattern_sets_column() abort
+  execute 'edit' fnameescape(g:zk_dir . '/a.md')
+  let @/ = 'again'
+  Ilist
+  call assert_equal([['foo again', 5]], map(getloclist(0), '[v:val.text, v:val.col]'))
+endfunction
