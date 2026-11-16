@@ -1,9 +1,6 @@
 if exists(':Launch') != 2
-  if &srr =~# "%s"
-    let s:redir = printf(&srr, has("win32") ? "nul" : "/dev/null")
-  else
-    let s:redir= &srr .. (has("win32") ? "nul" : "/dev/null")
-  endif
+  let s:null = has('win32') ? 'nul' : '/dev/null'
+  let s:redir = &shellredir =~# '%s' ? printf(&shellredir, s:null) : &shellredir . s:null
 
   " Copied from NetrwPlugin.vim at 9.1.0818
   if has('unix')
@@ -57,9 +54,12 @@ if exists(':Launch') == 2 && exists(':Open') != 2
   elseif executable('open')
       let s:cmd = 'open'
   endif
-  function s:Open(file)
-    if !exists('s:cmd') && !exists('g:netrw_browsex_viewer')
-      echoerr "No program to open this path found. See :help Open for more information."
+  if !exists('s:cmd') && exists('g:netrw_browsex_viewer')
+    let s:cmd = g:netrw_browsex_viewer
+  endif
+  function s:Open(file) abort
+    if !exists('s:cmd')
+      echoerr 'No program to open this path found. See :help Open for more information.'
     else
       exe 'Launch' s:cmd shellescape(a:file, 1)
     endif

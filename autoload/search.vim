@@ -2,7 +2,7 @@
 " From http://www.reddit.com/r/vim/comments/1rzvsm/do_any_of_you_redirect_results_of_i_to_the/
 function! search#list(type, line1, line2, bang, search_pattern) abort
     let type = a:type
-    let l:ouput = ''
+    let l:output = ''
     redir => l:output
     let search_pattern =
           \ (a:search_pattern =~# '\v^/?$' ? '/' . @/ : a:search_pattern)
@@ -15,16 +15,16 @@ function! search#list(type, line1, line2, bang, search_pattern) abort
         return
     endif
     " Our results may span multiple files so we need to build a relatively complex list based on filenames.
-    let filename   = ""
+    let filename   = ''
     let qf_entries = []
     for line in lines
-        if line !~ '^\s*\d\+:'
+        if line !~# '^\s*\d\+:'
             let filename = fnamemodify(line, ':p:.')
         else
             let lnum = split(line)[1]
-            let text = substitute(line, '^\s*.\{-}:\s*\S\{-}\s', "", "")
+            let text = substitute(line, '^\s*.\{-}:\s*\S\{-}\s', '', '')
             let col  = match(text, a:search_pattern) + 1
-            call add(qf_entries, {"filename" : filename, "lnum" : lnum, "col" : col, "vcol" : 1, "text" : text})
+            call add(qf_entries, {'filename': filename, 'lnum': lnum, 'col': col, 'vcol': 1, 'text': text})
         endif
     endfor
 
