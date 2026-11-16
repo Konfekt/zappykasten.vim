@@ -4,7 +4,7 @@
 
 *Requirements*~
 Zappykasten should work on Linux, Mac and Microsoft Windows, notably in Git Bash.
-Before installing Zappykasten, make sure ripgrep and fzf(.vim) is installed.
+Before installing Zappykasten, make sure ripgrep and fzf(.vim) are installed.
 
 *Installation*~
 To install Zappykasten using vim-plug:
@@ -39,9 +39,8 @@ let g:zk_search_paths += [$HOME . '/diary', $HOME . '/notes', $HOME . '/Desktop'
 - In insert mode:
   - press <C-X><C-I> to complete words from linked notes
   - press <C-X><C-Z> to insert a link to a note (Zettel), searching for the term
-    before the cursor, which can be refined in a fuzzy searcher. (The
-    inserted path will be by default, though see g:zk_insert_note_path, relative
-    to the directory containing the currently open note, usually g:zk_maindir.)
+    before the cursor, which can be refined in a fuzzy searcher. (By default,
+    only the name of the note is inserted; see g:zk_insert_note_path.)
   - to insert a tag, such as Zettel, surround it with double brackets (such
     as in [[Zettel]]).
 
@@ -104,9 +103,10 @@ CONFIGURATION                                      *zappykasten-configuration*
 >
         let g:zk_use_ignore_files = 1
 <
-*   Ignore Patterns: additional ignore patterns.
+*   Ignore Patterns: additional glob patterns of files to ignore, as a list
+    (or a single pattern as a string).
 >
-        let g:zk_ignore_pattern = ''
+        let g:zk_ignore_pattern = ['*.pdf', 'archive/**']
 <
 *   Use Short Pathnames: Truncates each path element to a single character.
 >
@@ -162,7 +162,7 @@ RIPGREP OPTIONS                                  *zappykasten-ripgrep_options*
           \ '--smart-case',
           \ '--line-number',
           \ '--color never',
-          \ ])
+          \ ]
 <
 
 This variable defines the default options used with Ripgrep when invoked within
@@ -187,10 +187,10 @@ FZF OPTIONS                                          *zappykasten-fzf_options*
           \ '--ansi',
           \ '--multi',
           \ '--exact',
-          \ '--inline-info',
+          \ '--info=inline',
           \ '--tiebreak=' . 'length,begin' ,
-          \ '--preview=' . shellescape('rg --pretty --context 3 -- {q} {1}'),
-          \ ])
+          \ '--preview=' . shellescape('rg --smart-case --pretty --context 3 -- {q} {1}'),
+          \ ]
 <
 
 This variable configures the default behavior of FZF, a command-line fuzzy
@@ -205,7 +205,7 @@ The default configuration includes:
     interface.
 *   `--exact`: Turns on exact-match mode, which restricts matches to exactly
     what is typed, as opposed to fuzzy matching.
-*   `--inline-info`: Displays search information (such as the number of
+*   `--info=inline`: Displays search information (such as the number of
     matches) inline, rather than as a separate line.
 *   `--tiebreak=length,begin`: Sets the criteria for resolving items that score
     the same during the search. It prioritizes shorter items and those that

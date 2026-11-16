@@ -23,6 +23,8 @@ Plug 'junegunn/fzf'
         Plug 'Konfekt/zappykasten.vim'
 ```
 
+Ripgrep is checked for when Vim starts, fzf only when it is first used, so the order in which the plug-ins load does not matter.
+
 Give [autosync](https://github.com/benstaniford/vim-autosync) a spin to keep it in sync with a git repo.
 
 ## Initial Setup
@@ -62,7 +64,7 @@ Inside the Fuzzy Search Window opened by `:ZK`, hit
 - `Ctrl-Y` to yank the selected filenames (to clipboard as well),
 - `Ctrl-S` to open the note in a horizontal split,
 - `Ctrl-V` to open the note in a vertical split, or
-- `Ctrl-T` to open the note in a a new tab.
+- `Ctrl-T` to open the note in a new tab.
 
 # Zettelkasten: Embracing Tags Over Folders
 
@@ -80,7 +82,12 @@ even more so since these tags usually need not be explicitly added, but already 
 
 Best, this method aligns with the workings of our mind, as we often recall files by remembering related words rather than a single label.
 
+# Tests
+
+Run `test/run.sh` to run the tests headless in Vim and Neovim (and those of the path shortener with `python3`).
+They need `rg` but not fzf, which they replace by stand-ins.
+
 # Credits
 
 This is a fork of [Alok Singh's notational-fzf-vim](https://github.com/alok/notational-fzf-vim) to whom all credit shall be due and whose license restrictions apply.
-If stands on the shoulders on Vim along with `ripgrep` and `fzf`.
+It stands on the shoulders of Vim along with `ripgrep` and `fzf`.
